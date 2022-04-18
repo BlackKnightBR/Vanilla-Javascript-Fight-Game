@@ -1,6 +1,9 @@
-const canvas = document.querySelector("#écranPrincipal");
+const canvas = document.querySelector('#écranPrincipal');
 const c = canvas.getContext('2d');
-const gravity = 1;
+const enemyHealtBar = document.querySelector('#barreDeSantéEnnemie');
+const playerHealtBar = document.querySelector('#barreDeSantéDuJoueur');
+const gravity = 10;
+
 
 //Lista de comandos usados no jogo
 const keys = {
@@ -39,19 +42,24 @@ canvas.height = 576;
 c.fillRect(0, 0, canvas.width, canvas.height);
 
 class Sprite {
-constructor({position, velocity, color}) {
+constructor({position, velocity, color, offset}) {
 		this.position = position
 		this.velocity = velocity
 		this.height = 150
 		this.width = 50
 		this.lastKey
 		this.attackBox = {
-			position: this.position,
+			position: {
+				x: this.position.x,
+				y: this.position.y
+			},
+			offset,
 			width: 100,
 			height: 50
 		}
 		this.color = color
-		this,isAttacking = false
+		this.isAttacking = false
+		this.healtBar = 100
 	}
 	
 	draw() {
@@ -59,12 +67,17 @@ constructor({position, velocity, color}) {
 		c.fillRect(this.position.x, this.position.y, this.width, this.height)
 		
 		//Atack box
-		c.fillStyle = this.color.hit;
-		c.fillRect(this.attackBox.position.x, this.attackBox.position.y, this.attackBox.width, this.attackBox.height)
+		if(this.isAttacking){
+			c.fillStyle = this.color.hit;
+			c.fillRect(this.attackBox.position.x, this.attackBox.position.y, this.attackBox.width, this.attackBox.height)
+		} 
 	}
 	
 	update() {
 		this.draw()
+		
+		this.attackBox.position.x = this.position.x + this.attackBox.offset.x
+		this.attackBox.position.y = this.position.y
 		
 		//Movimento no eixo Y
 		this.position.y += this.velocity.y;
@@ -101,6 +114,10 @@ const player = new Sprite({
 	color: {
 		body: 'green',
 		hit: 'red'
+	},
+	offset: {
+		x: 0,
+		y: 0
 	}
 })
 
@@ -116,9 +133,23 @@ const enemy = new Sprite({
 	color: {
 		body: 'yellow',
 		hit: 'blue'
+	},
+	offset: {
+		x: -50,
+		y: 0
 	}
 })
 
+
+function rectangularCollision({rectangle1,rectangle2}) {
+	//Revisar
+	return (
+		rectangle1.attackBox.position.x + rectangle1.attackBox.width >= rectangle2.position.x &&
+		rectangle1.attackBox.position.x <= rectangle2.position.x + rectangle2.width &&
+		rectangle1.attackBox.position.y + rectangle1.attackBox.height >= rectangle2.position.y &&
+		rectangle1.attackBox.position.y <= rectangle2.position.y + rectangle2.height
+	)
+}
 
 
 function animate() {
@@ -144,12 +175,24 @@ function animate() {
 		enemy.velocity.x = 5
 	}
 	
-	if(player.attackBox.position.x + player.attackBox.width >= enemy.position.x &&
-		player.attackBox.position.x + player.attackBox.width <= enemy.position.x + enemy.width &&
-		player.attackBox.position.y + player.attackBox.height >= enemy.position.y &&
-		player.attackBox.position.y + player.attackBox.width <= enemy.position.y + enemy.height &&
-		player.isAttacking){
+	if( rectangularCollision({
+		rectangle1: player,
+		rectangle2: enemy
+	}) && player.isAttacking){	
+		player.isAttacking = false
+		enemy.healtBar -= 10
+		enemyHealtBar.style.width = enemy.healtBar + '%'
 		console.log('Hit')
+	}
+	
+	if( rectangularCollision({
+		rectangle1: enemy,
+		rectangle2: player
+	}) && enemy.isAttacking){	
+		enemy.isAttacking = false
+		player.healtBar -= 10
+		playerHealtBar.style.width = player.healtBar + '%'
+		console.log('Enemy Hit ')
 	}
 	
 }
@@ -158,7 +201,7 @@ animate();
 
 window.addEventListener('keydown', (event) => {
 	//console.log(event); - log completo do evento 'keydown'
-	console.log(event.key); //Exibe o caracter da tecla
+	//console.log(event.key); //Exibe o caracter da tecla
 	
 	switch(event.key){
 		case 'd':
@@ -172,6 +215,9 @@ window.addEventListener('keydown', (event) => {
 		case 'w':
 			player.velocity.y = -20
 			break
+		case ' ':
+			player.attack()
+			break
 		//Enemy keys
 		case 'ArrowRight':
 			keys.ArrowRight.pressed = true
@@ -184,12 +230,15 @@ window.addEventListener('keydown', (event) => {
 		case 'ArrowUp':
 			enemy.velocity.y = -20
 			break
+		case ',':
+			enemy.attack()
+			break
 	}
 });
 
 window.addEventListener('keyup', (event) => {
 	//console.log(event); - log completo do evento 'keydown'
-	console.log(event.key); //Exibe o caracter da tecla
+	//console.log(event.key); //Exibe o caracter da tecla
 	
 	switch(event.key){
 		case 'd':

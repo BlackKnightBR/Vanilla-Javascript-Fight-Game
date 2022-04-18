@@ -7,8 +7,23 @@
     <link type="text/css" rel="stylesheet" href="_css/estilo.css">
 </head>
 <body>
-	<canvas id='écranPrincipal'></canvas>
-	
+	<div id='contient'>
+		<div id='contientDesInformations'>
+			<!-- Player Healt Bar -->
+			<div id='rightBar' class='healtBarDiv'>
+				<div class='backgroundBar'></div>
+				<div id='barreDeSantéDuJoueur'></div>
+			</div>
+			<!-- Timer clock -->
+			<div id='minuteur'></div>
+			<!-- Enemy Healt Bar -->
+			<div id='leftBar' class='healtBarDiv'>
+				<div class='backgroundBar'></div>
+				<div id='barreDeSantéEnnemie'></div>
+			</div>
+		</div>
+		<canvas id='écranPrincipal'></canvas>
+	</div>
 <script type="text/javascript" src="_js/index.js"></script>
 </body>
 </html>

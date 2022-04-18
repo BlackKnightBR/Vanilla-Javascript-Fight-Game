@@ -1,0 +1,57 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.healtBarDiv {
+	position: relative;
+	width: 100%;
+	height: 30px;
+}
+
+.backgroundBar{
+	position: absolute;
+	background-color: blue;
+	height: 30px;
+	width: 100%;
+}
+
+#contient {
+	position: relative;
+	display: inline-block;
+}
+
+#contientDesInformations {
+	width: 100%;
+	position: absolute;
+	display: flex;
+	align-items: center;
+	padding: 20px;
+}
+
+#barreDeSantéDuJoueur {
+	position: absolute;
+	background-color: yellow;
+	height: 30px;
+	width: 100%;
+}
+
+#minuteur {
+	background-color: yellow;
+	height: 80px;
+	width: 80px;
+	flex-shrink: 0;
+}
+
+#barreDeSantéEnnemie {
+	position: absolute;
+	background-color: yellow;
+	height: 30px;
+	width: 100%;
+}
+
+#rightBar {
+	display: flex;
+	justify-content: flex-end;
+}
