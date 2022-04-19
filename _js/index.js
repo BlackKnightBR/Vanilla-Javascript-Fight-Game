@@ -2,7 +2,10 @@ const canvas = document.querySelector('#écranPrincipal');
 const c = canvas.getContext('2d');
 const enemyHealtBar = document.querySelector('#barreDeSantéEnnemie');
 const playerHealtBar = document.querySelector('#barreDeSantéDuJoueur');
+const timerElement = document.querySelector('#minuteur');
 const gravity = 10;
+let timer = 60;
+let timeId
 
 
 //Lista de comandos usados no jogo
@@ -151,6 +154,35 @@ function rectangularCollision({rectangle1,rectangle2}) {
 	)
 }
 
+function determineWinner({player, enemy, timeId}){
+	
+	let displayElement = document.querySelector('#présentoir')
+	
+	clearTimeout(timeId);
+	displayElement.style.display = 'flex'
+	if ( player.healtBar === enemy.healtBar){
+		displayElement.innerHTML = 'tie'
+	} else if(player.healtBar > enemy.healtBar ){
+		displayElement.innerHTML = 'player 1 wins'
+	} else if(player.healtBar < enemy.healtBar){
+		displayElement.innerHTML = 'player 2 wins'
+	}
+}
+
+
+function decreaseTimer(){
+	timeId = setTimeout(decreaseTimer, 1000)
+	if(timer> 0) {
+		timer--
+		timerElement.innerHTML = timer
+	}
+	if(timer === 0){
+		determineWinner({player, enemy, timeId})
+	}
+	
+}
+
+decreaseTimer()
 
 function animate() {
 	window.requestAnimationFrame(animate)
@@ -195,6 +227,9 @@ function animate() {
 		console.log('Enemy Hit ')
 	}
 	
+	if(player.healtBar === 0 || enemy.healtBar === 0){
+		determineWinner({player, enemy , timeId})
+	}
 }
 
 animate();
